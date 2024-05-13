@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>bpnn_csharp</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Collapsenav.Net.Tool.Excel.MiniExcel" Version="1.3.2" />
+    <None Include="./Student_Performance.xlsx" CopyToOutputDirectory="always" />
+  </ItemGroup>
+</Project>
