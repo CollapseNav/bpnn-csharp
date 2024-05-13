@@ -16,15 +16,21 @@ var datas = new ReadConfig<StudentPreference>()
 .Add("Sample Question Papers Practiced", i => i.Papers)
 .Add("Performance Index", i => i.Score)
 .ToEntity(reader).Shuffle();
+
 var rate = 0.7;
 var train = datas.Take((int)(datas.Count() * rate)).ToList();
 var test = datas.Skip(train.Count()).ToList();
+
+// 一些超参设置
 var lr = 1e-8;
 var epoch = 50000;
 var targetError = 1e-3;
-var mont = 1;
+var mont = 5e-1;
 
-Console.WriteLine("Test---------------");
+
+// 开始训练
+Console.WriteLine("Train---------------");
+var trainError = 0.0;
 for (; epoch-- > 0;)
 {
     double error = 0;
@@ -32,14 +38,20 @@ for (; epoch-- > 0;)
     {
         model.Forward(data.GetInput());
         model.Back(data.GetOutput(), lr, mont);
-        error = Math.Abs(model.GetError(data.GetOutput()[0]));
+        error = model.GetError(data.GetOutput()[0]);
     }
+    trainError += error;
     if (epoch % 10 == 0)
+    {
+        trainError /= 10;
         Console.WriteLine(error);
-    if (error < targetError || error == double.NaN)
-        break;
+        // 达到目标误差时停止训练
+        if (Math.Abs(trainError) < targetError || error == double.NaN)
+            break;
+    }
 }
 
+// 开始测试
 Console.WriteLine("Test---------------");
 var testError = 0.0;
 foreach (var data in test)
@@ -48,13 +60,8 @@ foreach (var data in test)
     Console.WriteLine($"{data.GetOutput()[0].PadRight(10)}{model.Output.First().Value}");
     testError += model.GetError(data.GetOutput()[0]);
 }
+// 输出平均测试误差
 Console.WriteLine(testError / test.Count);
-
-class Data
-{
-    public double SAT { get; set; }
-    public double GPA { get; set; }
-}
 
 class StudentPreference
 {

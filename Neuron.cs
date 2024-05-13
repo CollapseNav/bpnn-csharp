@@ -54,10 +54,6 @@ public class Neuron
     public double GetError(double target)
     {
         return (target - Value) / 2;
-
-        // var mean = (target + Value) / 2;
-        // return ((mean - target) * (mean - target) + (mean - Value) * (mean - Value)) / 2;
-        // return (target - Value) * (target - Value);
     }
     /// <summary>
     /// 更新权重
