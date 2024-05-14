@@ -12,9 +12,7 @@ public class Synapse
 {
     public Synapse(Neuron input, Neuron outPut)
     {
-        Input = input;
-        Output = outPut;
-        Weight = NetWork.GetRandom();
+        (Input, Output, Weight) = (input, outPut, NetWork.GetRandom());
         Input.Outputs.Add(this);
         Output.Inputs.Add(this);
     }

@@ -55,12 +55,6 @@ class NetWork
     /// 使用统一的随机数生成, 便于通过种子固定
     /// </summary>
     /// <returns></returns>
-    public static double GetRandom()
-    {
-        return Rand.NextDouble();
-    }
-    public static void SetRandSeed(int seed)
-    {
-        Rand = new Random(seed);
-    }
+    public static double GetRandom() => Rand.NextDouble() / 10;
+    public static void SetRandSeed(int seed) => Rand = new Random(seed);
 }

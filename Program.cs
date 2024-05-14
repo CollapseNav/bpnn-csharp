@@ -3,7 +3,7 @@ using Collapsenav.Net.Tool.Excel;
 using bpnn_csharp;
 NetWork model = new NetWork();
 model.AddLayer(5, ReLu.Instance);
-model.AddLayer(8, ReLu.Instance);
+model.AddLayer(5, ReLu.Instance);
 model.AddLayer(1, Linear.Instance);
 Console.WriteLine();
 
@@ -15,7 +15,7 @@ var datas = new ReadConfig<StudentPreference>()
 .Add("Sleep Hours", i => i.Sleep)
 .Add("Sample Question Papers Practiced", i => i.Papers)
 .Add("Performance Index", i => i.Score)
-.ToEntity(reader).Shuffle();
+.ToEntity(reader);
 
 var rate = 0.7;
 var train = datas.Take((int)(datas.Count() * rate)).ToList();
@@ -34,7 +34,7 @@ var trainError = 0.0;
 for (; epoch-- > 0;)
 {
     double error = 0;
-    foreach (var data in train.Shuffle(3))
+    foreach (var data in train.Shuffle().Take(train.Count / 10))
     {
         model.Forward(data.GetInput());
         model.Back(data.GetOutput(), lr, mont);

@@ -12,13 +12,7 @@ namespace bpnn_csharp;
 public class Neuron
 {
     public Neuron(IActivationFunction actFun)
-    {
-        Inputs = new();
-        Outputs = new();
-        ActivationFunction = actFun;
-        // 默认的随机偏置
-        Bias = NetWork.GetRandom() / 10;
-    }
+        => (Inputs, Outputs, ActivationFunction, Bias) = (new List<Synapse>(), new List<Synapse>(), actFun, NetWork.GetRandom());
     /// <summary>
     /// 值
     /// </summary>
@@ -41,32 +35,24 @@ public class Neuron
     }
     public double GetGradient(double? target = null)
     {
-        if (!target.HasValue)
-            Gradient = Outputs.Sum(i => i.Output.Gradient * i.Weight) * ActivationFunction.Back(Value);
-        else
-            Gradient = GetError(target.Value) * ActivationFunction.Back(Value);
+        Gradient = target.HasValue
+               ? GetError(target.Value) * ActivationFunction.Back(Value)
+               : Outputs.Sum(i => i.Output.Gradient * i.Weight) * ActivationFunction.Back(Value);
         return Gradient;
     }
-    public void Back(double target)
-    {
-        Gradient = GetError(target) * ActivationFunction.Back(Value);
-    }
-    public double GetError(double target)
-    {
-        return (target - Value) / 2;
-    }
+    public void Back(double target) => Gradient = GetError(target) * ActivationFunction.Back(Value);
+    public double GetError(double target) => (target - Value) / 2;
     /// <summary>
     /// 更新权重
     /// </summary>
     /// <param name="lr"></param>
     public void UpdateWeight(double lr, double mont = 1)
     {
-        var preDelta = BiasDelta;
         BiasDelta = lr * Gradient;
         Bias += BiasDelta;
         foreach (var synapse in Inputs)
         {
-            preDelta = synapse.WeightDelta;
+            var preDelta = synapse.WeightDelta;
             synapse.WeightDelta = lr * Gradient * synapse.Input.Value;
             synapse.Weight += synapse.WeightDelta + preDelta * mont;
         }
