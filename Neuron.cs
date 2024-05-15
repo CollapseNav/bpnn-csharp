@@ -17,6 +17,9 @@ public class Neuron
     /// 值
     /// </summary>
     public double Value { get; set; }
+    /// <summary>
+    /// 激活函数
+    /// </summary>
     public IActivationFunction ActivationFunction { get; private set; }
     /// <summary>
     /// 偏置
@@ -48,12 +51,12 @@ public class Neuron
     /// <param name="lr"></param>
     public void UpdateWeight(double lr, double mont = 1)
     {
-        BiasDelta = lr * Gradient;
+        var BiasDelta = lr * Gradient;
         Bias += BiasDelta;
         foreach (var synapse in Inputs)
         {
             var preDelta = synapse.WeightDelta;
-            synapse.WeightDelta = lr * Gradient * synapse.Input.Value;
+            synapse.WeightDelta = BiasDelta * synapse.Input.Value;
             synapse.Weight += synapse.WeightDelta + preDelta * mont;
         }
     }
