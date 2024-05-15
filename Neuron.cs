@@ -60,6 +60,23 @@ public class Neuron
             synapse.Weight += synapse.WeightDelta + preDelta * mont;
         }
     }
+    // /// <summary>
+    // /// 更新权重
+    // /// </summary>
+    // /// <param name="lr"></param>
+    // public void UpdateWeight(double lr, double mont = 1)
+    // {
+    //     var BiasDelta = lr * Gradient;
+    //     Bias += BiasDelta;
+    //     foreach (var synapse in Inputs)
+    //         synapse.Weight += BiasDelta * synapse.Input.Value;
+    // }
+    /// <summary>
+    /// 输入
+    /// </summary>
     public List<Synapse> Inputs { get; set; }
+    /// <summary>
+    /// 输出
+    /// </summary>
     public List<Synapse> Outputs { get; set; }
 }
