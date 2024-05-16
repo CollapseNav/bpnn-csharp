@@ -5,7 +5,7 @@ namespace bpnn_csharp;
 /// <summary>
 /// 神经网络
 /// </summary>
-class NetWork
+public class NetWork
 {
     public static Random Rand = new(0);
     public NetWork()
@@ -13,7 +13,13 @@ class NetWork
         Layers = new();
     }
     public List<Layer> Layers { get; set; }
+    /// <summary>
+    /// 输入层
+    /// </summary>
     public Layer Input => Layers.First();
+    /// <summary>
+    /// 输出层
+    /// </summary>
     public Layer Output => Layers.Last();
     /// <summary>
     /// 添加一层网络
@@ -34,10 +40,10 @@ class NetWork
         }
         return this;
     }
-    public void Forward(double[] inputs)
+    public IEnumerable<double> Forward(double[] inputs)
     {
         Input.SelectWithIndex().ForEach(i => i.value.Value = inputs[i.index]);
-        Output.ForEach(i => _ = i.GetValue());
+        return Output.Select(i => i.GetValue()).ToList();
     }
     public void Back(double[] target, double lr, double mont = 1)
     {

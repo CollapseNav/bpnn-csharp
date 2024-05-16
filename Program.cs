@@ -27,6 +27,9 @@ var epoch = 50000;
 var targetError = 1e-3;
 var mont = 5e-1;
 
+var count = train.Count / 5;
+
+Console.WriteLine(count);
 
 // 开始训练
 Console.WriteLine("Train---------------");
@@ -34,19 +37,19 @@ var trainError = 0.0;
 for (; epoch-- > 0;)
 {
     double error = 0;
-    foreach (var data in train.Shuffle().Take(train.Count / 10))
+    foreach (var data in train.Shuffle().Take(count))
     {
         model.Forward(data.GetInput());
         model.Back(data.GetOutput(), lr, mont);
         error = model.GetError(data.GetOutput()[0]);
     }
     trainError += error;
-    if (epoch % 10 == 0)
+    if (epoch % 50 == 0)
     {
-        trainError /= 10;
-        Console.WriteLine(error);
+        trainError = Math.Abs(trainError / 50);
+        Console.WriteLine(trainError);
         // 达到目标误差时停止训练
-        if (Math.Abs(trainError) < targetError || error == double.NaN)
+        if (trainError < targetError || error == double.NaN)
             break;
     }
 }
@@ -56,8 +59,8 @@ Console.WriteLine("Test---------------");
 var testError = 0.0;
 foreach (var data in test)
 {
-    model.Forward(data.GetInput());
-    Console.WriteLine($"{data.GetOutput()[0].PadRight(10)}{model.Output.First().Value}");
+    var output = model.Forward(data.GetInput());
+    Console.WriteLine($"{data.GetOutput()[0].PadRight(10)}{output.First()}");
     testError += model.GetError(data.GetOutput()[0]);
 }
 // 输出平均测试误差

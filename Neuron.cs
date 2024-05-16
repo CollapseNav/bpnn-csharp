@@ -44,7 +44,7 @@ public class Neuron
         return Gradient;
     }
     public void Back(double target) => Gradient = GetError(target) * ActivationFunction.Back(Value);
-    public double GetError(double target) => (target - Value) / 2;
+    public double GetError(double target) => target - Value;
     /// <summary>
     /// 更新权重
     /// </summary>
