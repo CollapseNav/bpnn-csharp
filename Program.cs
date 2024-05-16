@@ -3,7 +3,7 @@ using Collapsenav.Net.Tool.Excel;
 using bpnn_csharp;
 NetWork model = new NetWork();
 model.AddLayer(5, ReLu.Instance);
-model.AddLayer(5, ReLu.Instance);
+model.AddLayer(4, ReLu.Instance);
 model.AddLayer(1, Linear.Instance);
 Console.WriteLine();
 
@@ -25,7 +25,7 @@ var test = datas.Skip(train.Count()).ToList();
 var lr = 1e-8;
 var epoch = 50000;
 var targetError = 1e-3;
-var mont = 5e-1;
+var mont = 0.5;
 
 var count = train.Count / 5;
 
@@ -44,9 +44,9 @@ for (; epoch-- > 0;)
         error = model.GetError(data.GetOutput()[0]);
     }
     trainError += error;
-    if (epoch % 50 == 0)
+    if (epoch % 10 == 0)
     {
-        trainError = Math.Abs(trainError / 50);
+        trainError = Math.Abs(trainError / 10);
         Console.WriteLine(trainError);
         // 达到目标误差时停止训练
         if (trainError < targetError || error == double.NaN)

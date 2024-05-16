@@ -38,9 +38,15 @@ public class Neuron
     }
     public double GetGradient(double? target = null)
     {
-        Gradient = target.HasValue
-               ? GetError(target.Value) * ActivationFunction.Back(Value)
-               : Outputs.Sum(i => i.Output.Gradient * i.Weight) * ActivationFunction.Back(Value);
+        // 最后一层直接计算
+        if (target.HasValue)
+            Back(target.Value);
+        // 如果存在输出神经元, 该神经元的梯度为后一层的梯度加权求和乘以偏导
+        if (Outputs.NotEmpty())
+            Gradient = Outputs.Sum(i => i.Output.Gradient * i.Weight) * ActivationFunction.Back(Value);
+        // 如果存在输入神经元, 则计算前一层的梯度
+        if (Inputs.NotEmpty())
+            Inputs.ForEach(i => i.Input.GetGradient());
         return Gradient;
     }
     public void Back(double target) => Gradient = GetError(target) * ActivationFunction.Back(Value);

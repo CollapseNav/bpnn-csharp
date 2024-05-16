@@ -49,7 +49,6 @@ public class NetWork
     {
         Output.SelectWithIndex().ForEach(kv => kv.value.GetGradient(target[kv.index]));
         Layers.Reverse();
-        Layers.Skip(1).ForEach(i => i.ForEach(ii => ii.GetGradient()));
         Layers.ForEach(i => i.ForEach(ii => ii.UpdateWeight(lr, mont)));
         Layers.Reverse();
     }
