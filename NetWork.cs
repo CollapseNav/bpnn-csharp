@@ -52,10 +52,7 @@ public class NetWork
         Layers.ForEach(i => i.ForEach(ii => ii.UpdateWeight(lr, mont)));
         Layers.Reverse();
     }
-    public double GetError(double target)
-    {
-        return Output.Sum(i => i.GetError(target));
-    }
+    public double GetError(double[] target) => Output.SelectWithIndex().Sum(i => i.value.GetError(target[i.index]));
     /// <summary>
     /// 使用统一的随机数生成, 便于通过种子固定
     /// </summary>

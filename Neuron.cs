@@ -40,7 +40,7 @@ public class Neuron
     {
         // 最后一层直接计算
         if (target.HasValue)
-            Back(target.Value);
+            Gradient = GetError(target.Value) * ActivationFunction.Back(Value);
         // 如果存在输出神经元, 该神经元的梯度为后一层的梯度加权求和乘以偏导
         if (Outputs.NotEmpty())
             Gradient = Outputs.Sum(i => i.Output.Gradient * i.Weight) * ActivationFunction.Back(Value);
@@ -49,7 +49,6 @@ public class Neuron
             Inputs.ForEach(i => i.Input.GetGradient());
         return Gradient;
     }
-    public void Back(double target) => Gradient = GetError(target) * ActivationFunction.Back(Value);
     public double GetError(double target) => target - Value;
     /// <summary>
     /// 更新权重

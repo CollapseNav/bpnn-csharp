@@ -3,7 +3,7 @@ using Collapsenav.Net.Tool.Excel;
 using bpnn_csharp;
 NetWork model = new NetWork();
 model.AddLayer(5, ReLu.Instance);
-model.AddLayer(4, ReLu.Instance);
+model.AddLayer(6, ReLu.Instance);
 model.AddLayer(1, Linear.Instance);
 Console.WriteLine();
 
@@ -25,33 +25,28 @@ var test = datas.Skip(train.Count()).ToList();
 var lr = 1e-8;
 var epoch = 50000;
 var targetError = 1e-3;
-var mont = 0.5;
+var mont = 1;
 
-var count = train.Count / 5;
-
-Console.WriteLine(count);
+var count = train.Count / 10;
 
 // 开始训练
 Console.WriteLine("Train---------------");
-var trainError = 0.0;
 for (; epoch-- > 0;)
 {
+    var trainError = 0.0;
     double error = 0;
     foreach (var data in train.Shuffle().Take(count))
     {
         model.Forward(data.GetInput());
         model.Back(data.GetOutput(), lr, mont);
-        error = model.GetError(data.GetOutput()[0]);
+        error += model.GetError(data.GetOutput());
     }
-    trainError += error;
-    if (epoch % 10 == 0)
-    {
-        trainError = Math.Abs(trainError / 10);
-        Console.WriteLine(trainError);
-        // 达到目标误差时停止训练
-        if (trainError < targetError || error == double.NaN)
-            break;
-    }
+    trainError += error / count;
+    trainError = Math.Abs(trainError);
+    Console.WriteLine(trainError);
+    // 达到目标误差时停止训练
+    if (trainError < targetError || error == double.NaN)
+        break;
 }
 
 // 开始测试
@@ -61,7 +56,7 @@ foreach (var data in test)
 {
     var output = model.Forward(data.GetInput());
     Console.WriteLine($"{data.GetOutput()[0].PadRight(10)}{output.First()}");
-    testError += model.GetError(data.GetOutput()[0]);
+    testError += model.GetError(data.GetOutput());
 }
 // 输出平均测试误差
 Console.WriteLine(testError / test.Count);
