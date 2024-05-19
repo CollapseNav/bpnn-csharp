@@ -25,7 +25,6 @@ public class Neuron
     /// 偏置
     /// </summary>
     public double Bias { get; set; }
-    public double BiasDelta { get; set; }
     /// <summary>
     /// 梯度
     /// </summary>
@@ -65,17 +64,6 @@ public class Neuron
             synapse.Weight += synapse.WeightDelta + preDelta * mont;
         }
     }
-    // /// <summary>
-    // /// 更新权重
-    // /// </summary>
-    // /// <param name="lr"></param>
-    // public void UpdateWeight(double lr, double mont = 1)
-    // {
-    //     var BiasDelta = lr * Gradient;
-    //     Bias += BiasDelta;
-    //     foreach (var synapse in Inputs)
-    //         synapse.Weight += BiasDelta * synapse.Input.Value;
-    // }
     /// <summary>
     /// 输入
     /// </summary>
