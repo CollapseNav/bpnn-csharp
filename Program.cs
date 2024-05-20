@@ -23,7 +23,7 @@ var test = datas.Skip(train.Count()).ToList();
 
 // 一些超参设置
 var lr = 1e-8;
-var epoch = 50000;
+var maxepoch = 50000;
 var targetError = 1e-3;
 var mont = 1;
 
@@ -31,9 +31,9 @@ var count = train.Count / 10;
 
 // 开始训练
 Console.WriteLine("Train---------------");
-for (; epoch-- > 0;)
+var trainError = 0.0;
+for (int epoch = 0; epoch++ < maxepoch;)
 {
-    var trainError = 0.0;
     double error = 0;
     foreach (var data in train.Shuffle().Take(count))
     {
@@ -42,11 +42,15 @@ for (; epoch-- > 0;)
         error += model.GetError(data.GetOutput());
     }
     trainError += error / count;
-    trainError = Math.Abs(trainError);
-    Console.WriteLine(trainError);
-    // 达到目标误差时停止训练
-    if (trainError < targetError || error == double.NaN)
-        break;
+    if (epoch % 10 == 0)
+    {
+        trainError = Math.Abs(trainError) / 10;
+        Console.WriteLine($"{epoch / 10}-epoch:{epoch}, error:{trainError}");
+        // 达到目标误差时停止训练
+        if (trainError < targetError || error == double.NaN)
+            break;
+        trainError = 0;
+    }
 }
 
 // 开始测试
