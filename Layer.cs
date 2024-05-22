@@ -7,7 +7,6 @@ namespace bpnn_csharp;
 /// </summary>
 public class Layer : IEnumerable<Neuron>
 {
-    private Layer? previous;
     public IActivationFunction ActivationFunction { get; private set; }
     public Layer(int size, IActivationFunction actFunc)
     {
@@ -24,10 +23,12 @@ public class Layer : IEnumerable<Neuron>
         get => previous; set
         {
             previous = value;
+            // 自动创建突触连接两次神经元
             if (previous != null)
                 Neurons.ForEach(n => previous.Neurons.ForEach(p => _ = new Synapse(p, n)));
         }
     }
+    private Layer? previous;
     /// <summary>
     /// 下一层
     /// </summary>

@@ -7,7 +7,7 @@ namespace bpnn_csharp;
 /// </summary>
 public class NetWork
 {
-    public static Random Rand = new(0);
+    public static Random Rand = new();
     public NetWork()
     {
         Layers = new();
@@ -29,12 +29,15 @@ public class NetWork
     /// <returns></returns>
     public NetWork AddLayer(int size, IActivationFunction actFun)
     {
+        // 如果添加了第一层, 直接进行初始化即可
         if (Layers.IsEmpty())
             Layers.Add(new Layer(size, actFun));
+        // 如果是之后的层, 则需要将前后两次进行连接
         else
         {
             var previous = Output;
             Layers.Add(new Layer(size, actFun));
+            // 连接前后两次神经元
             Output.Previous = previous;
             previous.Next = Output;
         }
@@ -47,9 +50,13 @@ public class NetWork
     }
     public void Back(double[] target, double lr, double mont = 1)
     {
+        // 计算所有神经元的梯度, GetGradient 内部有递归处理
         Output.SelectWithIndex().ForEach(kv => kv.value.GetGradient(target[kv.index]));
+        // 先将网络反过来
         Layers.Reverse();
+        // 然后从后完全一层一层更新偏置和权重
         Layers.ForEach(i => i.ForEach(ii => ii.UpdateWeight(lr, mont)));
+        // 更新完成之后再度翻转, 使得网络恢复原状
         Layers.Reverse();
     }
     public double GetError(double[] target) => Output.SelectWithIndex().Sum(i => i.value.GetError(target[i.index]));
@@ -58,5 +65,9 @@ public class NetWork
     /// </summary>
     /// <returns></returns>
     public static double GetRandom() => Rand.NextDouble() / 10;
-    public static void SetRandSeed(int seed) => Rand = new Random(seed);
+    /// <summary>
+    /// 设置随机数种子
+    /// </summary>
+    /// <param name="seed"></param>
+    public void SetRandSeed(int seed) => Rand = new Random(seed);
 }

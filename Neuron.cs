@@ -11,6 +11,9 @@ namespace bpnn_csharp;
 /// </remarks>
 public class Neuron
 {
+    /// <summary>
+    /// 简单初始化神经元
+    /// </summary>
     public Neuron(IActivationFunction actFun)
         => (Inputs, Outputs, ActivationFunction, Bias) = (new List<Synapse>(), new List<Synapse>(), actFun, NetWork.GetRandom());
     /// <summary>
@@ -55,10 +58,13 @@ public class Neuron
     /// <param name="lr"></param>
     public void UpdateWeight(double lr, double mont = 1)
     {
+        // 计算系数
         var BiasDelta = lr * Gradient;
+        // 调整神经元的偏置
         Bias += BiasDelta;
         foreach (var synapse in Inputs)
         {
+            // 更新突触权重
             var preDelta = synapse.WeightDelta;
             synapse.WeightDelta = BiasDelta * synapse.Input.Value;
             synapse.Weight += synapse.WeightDelta + preDelta * mont;

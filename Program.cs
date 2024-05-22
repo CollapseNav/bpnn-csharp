@@ -1,11 +1,6 @@
 ﻿using Collapsenav.Net.Tool;
 using Collapsenav.Net.Tool.Excel;
 using bpnn_csharp;
-NetWork model = new NetWork();
-model.AddLayer(5, ReLu.Instance);
-model.AddLayer(6, ReLu.Instance);
-model.AddLayer(1, Linear.Instance);
-Console.WriteLine();
 
 var reader = new MiniExcelReader("./Student_Performance.xlsx");
 var datas = new ReadConfig<StudentPreference>()
@@ -17,17 +12,32 @@ var datas = new ReadConfig<StudentPreference>()
 .Add("Performance Index", i => i.Score)
 .ToEntity(reader);
 
+// 划分训练集和测试集, 70%训练集，30%测试集
 var rate = 0.7;
 var train = datas.Take((int)(datas.Count() * rate)).ToList();
 var test = datas.Skip(train.Count()).ToList();
 
 // 一些超参设置
+// 学习率
 var lr = 1e-8;
+// 最大迭代次数
 var maxepoch = 50000;
+// 目标误差
 var targetError = 1e-3;
+// 随机数种子
+var seed = 0;
 var mont = 1;
 
+// 减少运算量, 每次只取十分之一进行计算
 var count = train.Count / 10;
+
+
+// 构建网络并且设置随机种子
+NetWork model = new NetWork();
+model.AddLayer(5, ReLu.Instance)
+.AddLayer(6, ReLu.Instance)
+.AddLayer(1, Linear.Instance)
+.SetRandSeed(seed);
 
 // 开始训练
 Console.WriteLine("Train---------------");
@@ -35,13 +45,18 @@ var trainError = 0.0;
 for (int epoch = 0; epoch++ < maxepoch;)
 {
     double error = 0;
+    // 随机取十分之一的训练数据进行训练
     foreach (var data in train.Shuffle().Take(count))
     {
+        // 前向传播计算输出
         model.Forward(data.GetInput());
+        // 反向传播
         model.Back(data.GetOutput(), lr, mont);
+        // 累计误差
         error += model.GetError(data.GetOutput());
     }
     trainError += error / count;
+    // 每10次输出一次误差
     if (epoch % 10 == 0)
     {
         trainError = Math.Abs(trainError) / 10;
@@ -58,8 +73,11 @@ Console.WriteLine("Test---------------");
 var testError = 0.0;
 foreach (var data in test)
 {
+    // 前向传播计算输出
     var output = model.Forward(data.GetInput());
+    // 输出真值和预测值进行对比
     Console.WriteLine($"{data.GetOutput()[0].PadRight(10)}{output.First()}");
+    // 累计误差
     testError += model.GetError(data.GetOutput());
 }
 // 输出平均测试误差
