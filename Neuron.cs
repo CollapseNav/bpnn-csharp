@@ -67,6 +67,7 @@ public class Neuron
             // 更新突触权重
             var preDelta = synapse.WeightDelta;
             synapse.WeightDelta = BiasDelta * synapse.Input.Value;
+            // 使用上一次的变化量和动量加快收敛
             synapse.Weight += synapse.WeightDelta + preDelta * mont;
         }
     }

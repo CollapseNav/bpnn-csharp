@@ -29,7 +29,7 @@ public class Synapse
     /// </summary>
     public double Weight { get; set; }
     /// <summary>
-    /// 权重导数
+    /// 权重的变化量
     /// </summary>
     public double WeightDelta { get; set; }
 }
