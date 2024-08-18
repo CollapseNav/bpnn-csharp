@@ -58,7 +58,7 @@ public class Neuron
     /// <param name="lr"></param>
     public void UpdateWeight(double lr, double mont = 1)
     {
-        // 计算系数
+        // 计算权重变化量
         var BiasDelta = lr * Gradient;
         // 调整神经元的偏置
         Bias += BiasDelta;
