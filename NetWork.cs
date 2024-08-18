@@ -54,7 +54,7 @@ public class NetWork
         Output.SelectWithIndex().ForEach(kv => kv.value.GetGradient(target[kv.index]));
         // 先将网络反过来
         Layers.Reverse();
-        // 然后从后完全一层一层更新偏置和权重
+        // 然后从后往前一层一层更新偏置和权重
         Layers.ForEach(i => i.ForEach(ii => ii.UpdateWeight(lr, mont)));
         // 更新完成之后再度翻转, 使得网络恢复原状
         Layers.Reverse();
