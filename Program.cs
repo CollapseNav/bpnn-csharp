@@ -10,32 +10,38 @@ var datas = new ReadConfig<StudentPreference>()
 .Add("Sleep Hours", i => i.Sleep)
 .Add("Sample Question Papers Practiced", i => i.Papers)
 .Add("Performance Index", i => i.Score)
-.ToEntity(reader);
+.ToEntity(reader).ToList();
+
+// 归一化
+var normalizer = new Normalizer();
+normalizer.Fit(datas.ToArray());
+foreach (var data in datas)
+    normalizer.Transform(data);
 
 // 划分训练集和测试集, 70%训练集，30%测试集
 var rate = 0.7;
 var train = datas.Take((int)(datas.Count() * rate)).ToList();
 var test = datas.Skip(train.Count()).ToList();
 
+
 // 一些超参设置
 // 学习率
-var lr = 1e-8;
+var lr = 1e-3;
 // 最大迭代次数
 var maxepoch = 50000;
 // 目标误差
-var targetError = 1e-3;
+var targetError = 1e-4;
 // 随机数种子
 var seed = 0;
-var mont = 1;
+var mont = 5e-1;
 
 // 减少运算量, 每次只取十分之一进行计算
 var count = train.Count / 10;
 
-
 // 构建网络并且设置随机种子
 NetWork model = new NetWork();
 model.AddLayer(5, ReLu.Instance)
-.AddLayer(6, ReLu.Instance)
+.AddLayer(5, ReLu.Instance)
 .AddLayer(1, Linear.Instance)
 .SetRandSeed(seed);
 
@@ -49,7 +55,7 @@ for (int epoch = 0; epoch++ < maxepoch;)
     foreach (var data in train.Shuffle().Take(count))
     {
         // 前向传播计算输出
-        model.Forward(data.GetInput());
+        var dd = model.Forward(data.GetInput());
         // 反向传播
         model.Back(data.GetOutput(), lr, mont);
         // 累计误差
@@ -62,28 +68,29 @@ for (int epoch = 0; epoch++ < maxepoch;)
         trainError = Math.Abs(trainError) / 10;
         Console.WriteLine($"{epoch / 10}-epoch:{epoch}, error:{trainError}");
         // 达到目标误差时停止训练
-        if (trainError < targetError || error == double.NaN)
+        if (trainError < targetError || double.IsNaN(error))
             break;
         trainError = 0;
     }
 }
-
+if (double.IsNaN(trainError))
+    return;
 // 开始测试
 Console.WriteLine("Test---------------");
 var testError = 0.0;
 foreach (var data in test)
 {
     // 前向传播计算输出
-    var output = model.Forward(data.GetInput());
+    var output = model.Forward(data.GetInput()).ToArray();
     // 输出真值和预测值进行对比
-    Console.WriteLine($"{data.GetOutput()[0].PadRight(10)}{output.First()}");
+    Console.WriteLine($"{data.Score.PadRight(10)}{normalizer.InverseTransform(output[0], 0)}");
     // 累计误差
     testError += model.GetError(data.GetOutput());
 }
 // 输出平均测试误差
 Console.WriteLine(testError / test.Count);
 
-class StudentPreference
+class StudentPreference : IData
 {
     /// <summary>
     /// 每个学生学习的总小时数
@@ -109,12 +116,24 @@ class StudentPreference
     /// 衡量每个学生的整体表现
     /// </summary>
     public double Score { get; set; }
+    private double[]? _input;
+    private double[]? _output;
     public double[] GetInput()
     {
-        return new double[] { Hours, PreScores, Ext, Sleep, Papers };
+        if (_input == null)
+            _input = new double[] { Hours, PreScores, Ext, Sleep, Papers };
+        return _input;
     }
     public double[] GetOutput()
     {
-        return new double[] { Score };
+        if (_output == null)
+            _output = new double[] { Score };
+        return _output;
     }
+}
+
+public interface IData
+{
+    double[] GetInput();
+    double[] GetOutput();
 }

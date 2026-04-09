@@ -64,7 +64,7 @@ public class NetWork
     /// 使用统一的随机数生成, 便于通过种子固定
     /// </summary>
     /// <returns></returns>
-    public static double GetRandom() => Rand.NextDouble() / 10;
+    public static double GetRandom() => Rand.NextDouble();
     /// <summary>
     /// 设置随机数种子
     /// </summary>
