@@ -52,6 +52,7 @@ public class Neuron
         return Gradient;
     }
     public double GetError(double target) => target - Value;
+    public double GetSquaredError(double target) => Math.Pow(target - Value, 2);
     /// <summary>
     /// 更新权重
     /// </summary>

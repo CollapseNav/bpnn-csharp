@@ -30,7 +30,7 @@ var lr = 1e-3;
 // 最大迭代次数
 var maxepoch = 50000;
 // 目标误差
-var targetError = 1e-4;
+var targetError = 1e-3;
 // 随机数种子
 var seed = 0;
 var mont = 5e-1;
@@ -65,9 +65,9 @@ for (int epoch = 0; epoch++ < maxepoch;)
     // 每10次输出一次误差
     if (epoch % 10 == 0)
     {
-        trainError = Math.Abs(trainError) / 10;
+        trainError = trainError / 10;
         Console.WriteLine($"{epoch / 10}-epoch:{epoch}, error:{trainError}");
-        // 达到目标误差时停止训练
+        // 达到目标误差时停止训练 (使用均方误差)
         if (trainError < targetError || double.IsNaN(error))
             break;
         trainError = 0;

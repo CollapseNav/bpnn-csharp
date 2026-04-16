@@ -59,7 +59,7 @@ public class NetWork
         // 更新完成之后再度翻转, 使得网络恢复原状
         Layers.Reverse();
     }
-    public double GetError(double[] target) => Output.SelectWithIndex().Sum(i => i.value.GetError(target[i.index]));
+    public double GetError(double[] target) => Output.SelectWithIndex().Sum(i => i.value.GetSquaredError(target[i.index]));
     /// <summary>
     /// 使用统一的随机数生成, 便于通过种子固定
     /// </summary>
